@@ -41,10 +41,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PATH="/app/.opentakserver_venv/bin:$PATH"
 
 LABEL maintainer="https://github.com/milsimdk"
-LABEL org.opencontainers.image.description="  is yet another open source TAK Server for ATAK, iTAK, and WinTAK"
-LABEL org.opencontainers.image.authors="Brian - https://github.com/brian7704"
-LABEL org.opencontainers.image.source="https://github.com/brian7704/OpenTAKServer"
+LABEL org.opencontainers.image.description="OpenTAKServer is yet another open source TAK Server for ATAK, iTAK, and WinTAK"
 LABEL org.opencontainers.image.version=${OTS_VERSION}
+LABEL org.opencontainers.image.authors="Brian - https://github.com/brian7704"
+LABEL org.opencontainers.image.source = "https://github.com/milsimdk/ots-docker-image"
 LABEL org.opencontainers.image.licenses="GNU General Public License v3.0"
 
 # Fix for https://github.com/brian7704/OpenTAKServer/issues/15
