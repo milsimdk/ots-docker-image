@@ -1,0 +1,11 @@
+---
+services:
+  ots:
+    image: ots:latest
+    build:
+      context: .
+      args:
+        - OTS_VERSION=1.1.6
+      tags:
+        - ots:latest
+        - ots:1.1.6
