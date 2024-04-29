@@ -27,3 +27,8 @@ commit: ## Logs for OpenTAKServer
 push:
 	git push
 	git push --tags
+
+public:
+	$(MAKE) commit
+	$(MAKE) retag
+	$(MAKE) push
