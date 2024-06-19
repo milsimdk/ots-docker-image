@@ -61,5 +61,8 @@ else:
 
 # Start the OpenTAKServer app
 print('Container init | Starting OpenTAKServer...')
-ots = subprocess.Popen( ['python3', '-m', 'opentakserver.app'], start_new_session=True)
-ots.wait()
+try:
+    ots = subprocess.Popen( ['python3', '-m', 'opentakserver.app'], start_new_session=True )
+    ots.wait()
+except KeyboardInterrupt:
+    ots.cancel()
