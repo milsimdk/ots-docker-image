@@ -25,9 +25,6 @@ ENV PATH="/app/.opentakserver_venv/bin:$PATH"
 # Install Opentakserver
 RUN pip3 install --no-cache-dir opentakserver==${BUILD_VERSION}
 
-# Fix for https://github.com/brian7704/OpenTAKServer/issues/15
-RUN pip3 uninstall -y bcrypt && pip3 install --no-cache-dir bcrypt==4.0.1
-
 # ************************************************************
 # Second stage: runtime
 # ************************************************************
@@ -63,6 +60,15 @@ WORKDIR /app/ots
 # Copy opentakserver from build image
 COPY --from=builder /app/.opentakserver_venv /app/.opentakserver_venv
 
+RUN pip3 uninstall -y bcrypt && pip3 install bcrypt==4.0.1
+
+# Add Healthcheck for OTS
+COPY __init__.py healthcheck.py /app/scripts/
+RUN chmod +x /app/scripts/*
+
+#HEALTHCHECK --interval=1m --start-period=1m CMD python3 /app/scripts/healthcheck.py
+
+# Run as OTS user
 USER ots
 
 # Flask will stop gracefully on SIGINT (Ctrl-C).
@@ -78,4 +84,5 @@ EXPOSE 8088/tcp
 # 8089 SSL CoT streaming port
 EXPOSE 8089/tcp
 
-CMD [ "python3", "-m" , "opentakserver.app"]
+#ENTRYPOINT [ "python3" ]
+CMD [ "python3", "/app/scripts/__init__.py" ]

@@ -1,0 +1,6 @@
+# Ignore everything in this directory
+*
+
+# Whitelist these files
+!healthcheck.py
+!__init__.py
