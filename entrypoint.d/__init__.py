@@ -6,6 +6,7 @@ from flask.config import Config as FlaskConfig;
 config_file = os.path.join( os.environ.get("DOCKER_OTS_DATA_FOLDER", "/app/ots/"), "config.yml" );
 config = FlaskConfig(config_file);
 
+#************ HELPERS ************
 def save_config(config):
     global config_file
     try:
@@ -15,9 +16,10 @@ def save_config(config):
     except BaseException as e:
         print("Container init | Failed to save config.yml: {}".format(e))
 
+#************ INIT ************
 # Get config file,
 # Load config.yml if it exists
-if not os.path.exists(config_file) or os.environ.get("DOCKER_CONFIG_OVERWRITE", False):
+if not os.path.exists(config_file) or bool( yaml.safe_load( os.environ.get("DEV_CONFIG_OVERWRITE", False) ) ):
     print("Container init | Creating config.yml")
 
     # Get default config from opentakserver
