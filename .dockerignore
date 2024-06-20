@@ -2,5 +2,5 @@
 *
 
 # Whitelist these files
+!entrypoint.d/
 !healthcheck.py
-!__init__.py

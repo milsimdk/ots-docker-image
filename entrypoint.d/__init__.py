@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, yaml, subprocess;
+import os, yaml;
 from opentakserver.defaultconfig import DefaultConfig;
 from flask.config import Config as FlaskConfig;
 
@@ -61,8 +61,3 @@ else:
 
 # Start the OpenTAKServer app
 print('Container init | Starting OpenTAKServer...')
-try:
-    ots = subprocess.Popen( ['python3', '-m', 'opentakserver.app'], start_new_session=True )
-    ots.wait()
-except KeyboardInterrupt:
-    ots.close()

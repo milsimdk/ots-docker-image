@@ -1,24 +1,23 @@
-
----
-
-# NOT READY FOR PRODUCTION YET
-
----
-
 # Docker image for OpenTAKServer
+---
+
+### NOT READY FOR PRODUCTION YET
+
+---
 
 Used here: https://github.com/milsimdk/ots-docker
 
+### Requirements
+ - Docker must be installed
+ - Docker compose v2 is used
+ - Platform support: linux/amd64, linux/arm64
 
-- Source: https://github.com/brian7704/OpenTAKServer
-- Platform support: linux/amd64, linux/arm64
-
-### Thanks
-  - [Brian](https://github.com/brian7704) for creating OpenTAKServer
-
-## Build arguments defaults
+### Build arguments defaults
 ```Dockerfile
-ARG OTS_VERSION
+ARG BUILD_VERSION
 ARG PGID=1000
 ARG PUID=1000
 ```
+
+### Thanks
+  - [Brian](https://github.com/brian7704) for creating [OpenTAKServer](https://github.com/brian7704/OpenTAKServer)

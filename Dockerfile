@@ -22,8 +22,8 @@ RUN python3 -m venv /app/.opentakserver_venv
 # Enable venv
 ENV PATH="/app/.opentakserver_venv/bin:$PATH"
 
-# Install Opentakserver
-RUN pip3 install --no-cache-dir opentakserver==${BUILD_VERSION}
+# Install Opentakserver, if $BUILD_VERSION is not set, install latest
+RUN pip3 install --no-cache-dir opentakserver${BUILD_VERSION:+==$BUILD_VERSION}
 
 # ************************************************************
 # Second stage: runtime
@@ -43,7 +43,7 @@ ENV PATH="/app/.opentakserver_venv/bin:$PATH"
 LABEL maintainer="https://github.com/milsimdk"
 LABEL org.opencontainers.image.title="Docker image for OpenTAKServer"
 LABEL org.opencontainers.image.description="OpenTAKServer is yet another open source TAK Server for ATAK, iTAK, and WinTAK"
-LABEL org.opencontainers.image.version="${BUILD_VERSION}"
+LABEL org.opencontainers.image.version="${BUILD_VERSION:-latest}"
 LABEL org.opencontainers.image.authors="Brian - https://github.com/brian7704"
 LABEL org.opencontainers.image.vendor="https://github.com/milsimdk"
 LABEL org.opencontainers.image.source="https://github.com/milsimdk/ots-docker-image"
@@ -63,10 +63,10 @@ COPY --from=builder /app/.opentakserver_venv /app/.opentakserver_venv
 RUN pip3 uninstall -y bcrypt && pip3 install bcrypt==4.0.1
 
 # Add Healthcheck for OTS
-COPY __init__.py healthcheck.py /app/scripts/
-RUN chmod +x /app/scripts/*
+COPY --chmod=755 ./entrypoint.d/ /etc/entrypoint.d
+COPY --chmod=755 ./healthcheck.py /app
 
-#HEALTHCHECK --interval=1m --start-period=1m CMD python3 /app/scripts/healthcheck.py
+#HEALTHCHECK --interval=1m --start-period=30s CMD /app/healthcheck.py
 
 # Run as OTS user
 USER ots
@@ -84,5 +84,5 @@ EXPOSE 8088/tcp
 # 8089 SSL CoT streaming port
 EXPOSE 8089/tcp
 
-#ENTRYPOINT [ "python3" ]
-CMD [ "python3", "/app/scripts/__init__.py" ]
+ENTRYPOINT [ "/etc/entrypoint.d/docker-entrypoint.sh" ]
+CMD ["python3", "-m", "opentakserver.app"]
