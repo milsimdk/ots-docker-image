@@ -85,4 +85,4 @@ EXPOSE 8088/tcp
 EXPOSE 8089/tcp
 
 ENTRYPOINT [ "/etc/entrypoint.d/docker-entrypoint.sh" ]
-CMD ["python3", "-m", "opentakserver.app"]
+CMD ["python3", "-u", "-m", "opentakserver.app"]

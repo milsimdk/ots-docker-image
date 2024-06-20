@@ -23,29 +23,35 @@ if not os.path.exists(config_file) or os.environ.get("DOCKER_CONFIG_OVERWRITE", 
     # Get default config from opentakserver
     config.from_object(DefaultConfig);
 
-    # Override settings to make OTS work in a container
-    config.update(
-        OTS_LISTENER_ADDRESS = os.environ.get("DOCKER_OTS_LISTENER_ADDRESS", "0.0.0.0"),
-        OTS_RABBITMQ_SERVER_ADDRESS = os.environ.get("DOCKER_OTS_RABBITMQ_SERVER_ADDRESS", "rabbitmq")
-    )
-
     # Get env variables with the prefix 'DOCKER_'
     # Used so we can override variables from the docker-compose file
     config.from_prefixed_env('DOCKER');
 
+    # Override settings to make OTS work in a container
+    config.update(
+        OTS_LISTENER_ADDRESS = os.environ.get("DOCKER_OTS_LISTENER_ADDRESS", "0.0.0.0"),
+        OTS_RABBITMQ_SERVER_ADDRESS = os.environ.get("DOCKER_OTS_RABBITMQ_SERVER_ADDRESS", "rabbitmq"),
+        OTS_CA_SUBJECT = '/C={}/ST={}/L={}/O={}/OU={}'.format( config["OTS_CA_COUNTRY"], config["OTS_CA_STATE"], config["OTS_CA_CITY"], config["OTS_CA_ORGANIZATION"], config["OTS_CA_ORGANIZATIONAL_UNIT"] ),
+        SECURITY_TOTP_ISSUER = config["OTS_CA_ORGANIZATION"]
+    )
+
     save_config(config)
 else:
     print('Container init | Found existing config.yml')
-
     print('Container init | Checking environment variables...')
+
+    # Get config.yml
     init_config_file = FlaskConfig(config_file)
     init_config_file.from_file(config_file, load=yaml.safe_load);
 
+    # Get Docker Env
     init_config_env = FlaskConfig(config_file)
     init_config_env.from_prefixed_env('DOCKER');
 
+    # Compare config.yml and docker env.
     init_config_diff = set(init_config_file).intersection(set(init_config_env))
 
+    # If there is a differnce between the two, update config.yml with the new docker env.
     if bool(init_config_diff):
         init_config_updated = dict()
         for value in init_config_diff:
