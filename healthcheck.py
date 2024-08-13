@@ -2,9 +2,10 @@
 import requests, sys;
 
 URL = "http://localhost:8081/api/health"
+HEADERS = {"User-Agent": "Docker-healthcheck"}
 
 try:
-    response = requests.head(URL)
+    response = requests.head(URL, headers = HEADERS)
 except Exception as e:
     sys.exit(1)
 else:

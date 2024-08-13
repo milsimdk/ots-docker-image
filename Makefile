@@ -12,23 +12,23 @@ help: ## This help.
 build: ## Build Images
 	docker compose build --no-cache
 
-retag: ## Stop OpenTAKServer
+retag: ## Delete version Tag, Push, Create version tag
 	git tag -d ${BUILD_VERSION}
 	git push origin :refs/tags/${BUILD_VERSION}
 	git tag ${BUILD_VERSION} -m "Version ${BUILD_VERSION} released"
 
-tag: ## Restart OpenTAKServer
+tag: ## Create version tag
 	git tag ${BUILD_VERSION} -m "Version ${BUILD_VERSION} released"
 
-commit: ## Logs for OpenTAKServer
+commit: ## Commit code
 	git add .
 	git commit -m'Working on ${BUILD_VERSION}'
 
-push:
+push: ## Push, Push Tags
 	git push
 	git push --tags
 
-public:
+public: ## Commit, Retag, Push
 	$(MAKE) commit
 	$(MAKE) retag
 	$(MAKE) push
