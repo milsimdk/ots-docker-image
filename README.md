@@ -13,10 +13,8 @@ Used here: https://github.com/milsimdk/ots-docker
  - Platform support: linux/amd64, linux/arm64
 
 ### Build arguments defaults
-```Dockerfile
-ARG BUILD_VERSION
-ARG PGID=1000
-ARG PUID=1000
+```env  
+BUILD_VERSION=v1.2.3
 ```
 
 ### Thanks
