@@ -17,35 +17,37 @@ def save_config(config):
         print("Container init | Failed to save config.yml: {}".format(e))
 
 def mediamtx_config_init():
-    global config_file
+    global config
     # Try to set the MediaMTX token
-    try:
-        mediamtx_config_template    = os.path.join(config["OTS_DATA_FOLDER"], "mediamtx", "mediamtx.template")
-        mediamtx_config_file        = os.path.join(config["OTS_DATA_FOLDER"], "mediamtx", "mediamtx.yml")
+    if config["OTS_MEDIAMTX_ENABLE"]:
+        try:
+            mediamtx_config_template    = os.path.join(config["OTS_DATA_FOLDER"], "mediamtx", "mediamtx.template")
+            mediamtx_config_file        = os.path.join(config["OTS_DATA_FOLDER"], "mediamtx", "mediamtx.yml")
 
-        # Do the mediamtx.* files exists ?
-        # Do we exists :O
-        if not os.path.isfile(mediamtx_config_file) and os.path.isfile(mediamtx_config_template):
-            # Copy mediamtx template to config file
-            shutil.copyfile( mediamtx_config_template, mediamtx_config_file )
-            # Update MediaMTX token
-            with open(mediamtx_config_file, "r") as mediamtx_config:
-                conf = mediamtx_config.read()
-                conf = conf.replace("MTX_TOKEN", config["OTS_MEDIAMTX_TOKEN"])
-            with open(mediamtx_config_file, "w") as mediamtx_config:
-                mediamtx_config.write(conf)
-            print("Container init | Generating MediaMTX config")
-            print("Container init | MediaMTX enabled")
-        else:
-            print("Container init | MediaMTX enabled")
-    except BaseException as e:
-        print("Container init | Failed to set MediaMTX token: {}".format(e))
-
+            # Do the mediamtx.* files exists ?
+            # Do we exists :O
+            if not os.path.isfile(mediamtx_config_file) and os.path.isfile(mediamtx_config_template):
+                # Copy mediamtx template to config file
+                shutil.copyfile( mediamtx_config_template, mediamtx_config_file )
+                # Update MediaMTX token
+                with open(mediamtx_config_file, "r") as mediamtx_config:
+                    conf = mediamtx_config.read()
+                    conf = conf.replace("MTX_TOKEN", config["OTS_MEDIAMTX_TOKEN"])
+                with open(mediamtx_config_file, "w") as mediamtx_config:
+                    mediamtx_config.write(conf)
+                print("Container init | Generating MediaMTX config")
+                print("Container init | MediaMTX enabled")
+            else:
+                print("Container init | MediaMTX enabled")
+        except BaseException as e:
+            print("Container init | Failed to set MediaMTX token: {}".format(e))
+    else:
+        print("Container init | MediaMTX disabled")
 
 #************ INIT ************
 # Get config file,
 # Load config.yml if it exists
-if not os.path.exists(config_file) or bool( yaml.safe_load( os.environ.get("DEV_CONFIG_OVERWRITE", False) ) ):
+if not os.path.exists(config_file) or bool( os.environ.get("DEV_CONFIG_OVERWRITE", False) ):
     print("Container init | Creating config.yml")
 
     # Get default config from opentakserver
@@ -63,6 +65,8 @@ if not os.path.exists(config_file) or bool( yaml.safe_load( os.environ.get("DEV_
         OTS_CA_SUBJECT = '/C={}/ST={}/L={}/O={}/OU={}'.format( config["OTS_CA_COUNTRY"], config["OTS_CA_STATE"], config["OTS_CA_CITY"], config["OTS_CA_ORGANIZATION"], config["OTS_CA_ORGANIZATIONAL_UNIT"] ),
         SECURITY_TOTP_ISSUER = config["OTS_CA_ORGANIZATION"]
     )
+
+    mediamtx_config_init()
 
     save_config(config)
 else:
@@ -93,13 +97,6 @@ else:
             save_config(init_config_file)
         else:
             print('Container init | No changed environment variables found')
-
-# Setup MediaMTX if enablede
-if config["OTS_MEDIAMTX_ENABLE"]:
-    mediamtx_config_init()
-else:
-    print("Container init | MediaMTX disabled")
-
 
 # Start the OpenTAKServer app
 print('Container init | Starting OpenTAKServer...')
