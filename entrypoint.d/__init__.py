@@ -47,7 +47,7 @@ def mediamtx_config_init():
 #************ INIT ************
 # Get config file,
 # Load config.yml if it exists
-if not os.path.exists(config_file) or bool( yaml.safe_load(os.environ.get("DEV_CONFIG_OVERWRITE", False)) ):
+if not os.path.exists(config_file) or yaml.safe_load(os.environ.get("DEV_CONFIG_OVERWRITE", 'False')) is True:
     print("Container init | Creating config.yml")
 
     # Get default config from opentakserver
