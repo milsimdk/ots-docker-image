@@ -30,5 +30,5 @@ push: ## Push, Push Tags
 
 public: ## Commit, Retag, Push
 	$(MAKE) commit
-## $(MAKE) retag
+	$(MAKE) tag
 	$(MAKE) push
