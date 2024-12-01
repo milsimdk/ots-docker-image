@@ -62,7 +62,7 @@ if not os.path.exists(config_file) or yaml.safe_load(os.environ.get("DEV_CONFIG_
         OTS_LISTENER_ADDRESS        = os.environ.get("DOCKER_OTS_LISTENER_ADDRESS", "0.0.0.0"),
         OTS_RABBITMQ_SERVER_ADDRESS = os.environ.get("DOCKER_OTS_RABBITMQ_SERVER_ADDRESS", "rabbitmq"),
         OTS_MEDIAMTX_API_ADDRESS    = os.environ.get("DOCKER_OTS_MEDIAMTX_API_ADDRESS", "http://mediamtx:9997"),
-        SECURITY_TOTP_ISSUER        = config["OTS_CA_ORGANIZATION"]
+        SECURITY_TOTP_ISSUER        = config["OTS_CA_ORGANIZATION"],
         OTS_CA_SUBJECT              = '/C={}/ST={}/L={}/O={}/OU={}'.format( config["OTS_CA_COUNTRY"], config["OTS_CA_STATE"], config["OTS_CA_CITY"], config["OTS_CA_ORGANIZATION"], config["OTS_CA_ORGANIZATIONAL_UNIT"] ),
     )
 
