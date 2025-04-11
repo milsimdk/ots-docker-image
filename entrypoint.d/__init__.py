@@ -66,7 +66,7 @@ if not os.path.exists(config_file) or yaml.safe_load(os.environ.get("DEV_CONFIG_
         OTS_CA_SUBJECT              = '/C={}/ST={}/L={}/O={}/OU={}'.format( config["OTS_CA_COUNTRY"], config["OTS_CA_STATE"], config["OTS_CA_CITY"], config["OTS_CA_ORGANIZATION"], config["OTS_CA_ORGANIZATIONAL_UNIT"] ),
     )
 
-    mediamtx_config_init()
+    #mediamtx_config_init()
     save_config(config)
 else:
     print('Container init | Found existing config.yml')
@@ -96,6 +96,9 @@ else:
             save_config(init_config_file)
         else:
             print('Container init | No changed environment variables found')
+
+# Check if MediaMTX is enabled, if so fix the config for MediaMTX
+mediamtx_config_init()
 
 # Start the OpenTAKServer app
 print('Container init | Starting OpenTAKServer...')
