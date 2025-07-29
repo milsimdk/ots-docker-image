@@ -4,7 +4,8 @@ from opentakserver.defaultconfig import DefaultConfig;
 from flask.config import Config as FlaskConfig;
 
 config_file = os.path.join( os.environ.get("DOCKER_OTS_DATA_FOLDER", "/app/ots/"), "config.yml" );
-config = FlaskConfig(config_file);
+with open(config_file, "r") as f:
+    config = yaml.safe_load(f)
 
 #************ HELPERS ************
 def save_config(config):
@@ -19,10 +20,10 @@ def save_config(config):
 def mediamtx_config_init():
     global config
     # Try to set the MediaMTX token
-    if config["OTS_MEDIAMTX_ENABLE"]:
+    if config.get("OTS_MEDIAMTX_ENABLE", False):
         try:
-            mediamtx_config_template    = os.path.join(config["OTS_DATA_FOLDER"], "mediamtx", "mediamtx.template")
-            mediamtx_config_file        = os.path.join(config["OTS_DATA_FOLDER"], "mediamtx", "mediamtx.yml")
+            mediamtx_config_template    = os.path.join(config.get("OTS_DATA_FOLDER"), "mediamtx", "mediamtx.template")
+            mediamtx_config_file        = os.path.join(config.get("OTS_DATA_FOLDER"), "mediamtx", "mediamtx.yml")
 
             # Do the mediamtx.* files exists ?
             # Do we exists :O
@@ -32,7 +33,7 @@ def mediamtx_config_init():
                 # Update MediaMTX token
                 with open(mediamtx_config_file, "r") as mediamtx_config:
                     conf = mediamtx_config.read()
-                    conf = conf.replace("MTX_TOKEN", config["OTS_MEDIAMTX_TOKEN"])
+                    conf = conf.replace("MTX_TOKEN", config.get("OTS_MEDIAMTX_TOKEN"))
                 with open(mediamtx_config_file, "w") as mediamtx_config:
                     mediamtx_config.write(conf)
                 print("Container init | Generating MediaMTX config")
