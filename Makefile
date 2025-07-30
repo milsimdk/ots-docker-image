@@ -10,6 +10,9 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 build: ## Build Images
+	docker compose build
+
+build-clean: ## Build Images
 	docker compose build --no-cache
 
 retag: ## Delete version Tag, Push, Create version tag
