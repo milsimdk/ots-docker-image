@@ -59,7 +59,7 @@ RUN pip3 uninstall -y bcrypt && pip3 install bcrypt==4.0.1
 COPY --chmod=755 ./entrypoint.d/ /etc/entrypoint.d
 COPY --chmod=755 ./healthcheck.py /app
 
-HEALTHCHECK --interval=1m --start-period=30s CMD /app/healthcheck.py
+HEALTHCHECK --interval=60s --start-period=30s CMD /app/healthcheck.py
 
 # Flask will stop gracefully on SIGINT (Ctrl-C).
 # Docker compose tries to stop processes using SIGTERM by default, then sends SIGKILL after a delay if the process doesn't stop.
