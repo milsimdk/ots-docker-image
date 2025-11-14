@@ -6,7 +6,7 @@ ARG BUILD_VERSION
 # ************************************************************
 # First stage: builder
 # ************************************************************
-FROM python:3.12 AS builder
+FROM python:3.13 AS builder
 # Make sure all messages always reach console
 ARG BUILD_VERSION
 
@@ -25,12 +25,12 @@ RUN python3 -m venv /app/.opentakserver_venv
 ENV PATH="/app/.opentakserver_venv/bin:$PATH"
 
 # Install Opentakserver, if $BUILD_VERSION is not set, install latest
-RUN pip3 install --no-cache-dir opentakserver${BUILD_VERSION:+==$BUILD_VERSION}
+RUN pip3 install --no-cache-dir opentakserver${BUILD_VERSION:+==$BUILD_VERSION} psycopg-binary
 
 # ************************************************************
 # Second stage: runtime
 # ************************************************************
-FROM python:3.12-slim AS runtime
+FROM python:3.13-slim AS runtime
 ARG BUILD_VERSION
 
 # Set environment variables
@@ -68,13 +68,7 @@ STOPSIGNAL SIGINT
 # 8081 OpenTAKServer
 EXPOSE 8081/tcp
 
-# 8088 TCP CoT streaming port
-EXPOSE 8088/tcp
-
-# 8089 SSL CoT streaming port
-EXPOSE 8089/tcp
-
 WORKDIR /app/ots
 
 ENTRYPOINT [ "/etc/entrypoint.d/docker-entrypoint.sh" ]
-CMD ["python3", "-m", "opentakserver.app"]
+CMD ["/app/.opentakserver_venv/bin/opentakserver"]

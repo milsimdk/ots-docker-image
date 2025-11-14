@@ -9,4 +9,6 @@ services:
       tags:
         - opentakserver:${BUILD_VERSION}
         - opentakserver:latest
+    environment:
+      - DOCKER_DEBUG=True
     container_name: opentakserver
