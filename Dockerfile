@@ -6,7 +6,7 @@ ARG BUILD_VERSION
 # ************************************************************
 # First stage: builder
 # ************************************************************
-FROM python:3.13 AS builder
+FROM python:3.12 AS builder
 # Make sure all messages always reach console
 ARG BUILD_VERSION
 
@@ -30,7 +30,7 @@ RUN pip3 install --no-cache-dir opentakserver${BUILD_VERSION:+==$BUILD_VERSION} 
 # ************************************************************
 # Second stage: runtime
 # ************************************************************
-FROM python:3.13-slim AS runtime
+FROM python:3.12-slim AS runtime
 ARG BUILD_VERSION
 
 # Set environment variables
