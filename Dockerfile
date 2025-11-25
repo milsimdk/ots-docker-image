@@ -1,7 +1,5 @@
 # syntax=docker/dockerfile:1
 ARG BUILD_VERSION
-#ARG PGID=1000
-#ARG PUID=1000
 
 # ************************************************************
 # First stage: builder
