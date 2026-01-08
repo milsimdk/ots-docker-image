@@ -59,4 +59,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
-            BUILD_VERSION=$BUILD_VERSION
+            BUILD_VERSION=${{ env.BUILD_VERSION }}
