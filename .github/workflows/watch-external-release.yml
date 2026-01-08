@@ -5,6 +5,9 @@ on:
     - cron: "0 * * * *"
   workflow_dispatch:
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 permissions:
   contents: write
   actions: write
@@ -26,7 +29,7 @@ jobs:
       - name: Fetch latest external release
         run: |
           LATEST=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/brian7704/OpenTAKServer/releases/latest \
             | jq -r .tag_name)
 
@@ -73,5 +76,3 @@ jobs:
           
           gh workflow run docker-publish.yml \
             -f release_tag="$NEW_RELEASE"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
