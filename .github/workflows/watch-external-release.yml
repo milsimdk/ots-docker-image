@@ -36,14 +36,14 @@ jobs:
         if: env.NEW_RELEASE == env.OLD_RELEASE
         run: |
           echo "No new external release detected. Skipping..."
-          exit 0   # Stop the workflow early
+          exit_with_success # This stops the workflow with a success status
       
       - name: Check if tag exists
         id: tagcheck
         run: |
           if git rev-parse "refs/tags/${NEW_RELEASE}" >/dev/null 2>&1; then
             echo "Tag ${NEW_RELEASE} already exists. Skipping..."
-            exit 0  # Stop the workflow early if the tag already exists
+            exit_with_success # This stops the workflow with a success status
           else
             echo "Tag ${NEW_RELEASE} does not exist. Proceeding..."
           fi
