@@ -35,12 +35,12 @@ jobs:
           echo "NEW_RELEASE=$LATEST" >> $GITHUB_ENV
       
       - name: Stop if no new release
-        if: env.NEW_RELEASE == dotenv.BUILD_VERSION
+        if: env.NEW_RELEASE == ${{ steps.dotenv.outputs.BUILD_VERSION }}
         run: |
           echo "No new external release detected. Skipping..."
       
       - name: Check if tag exists
-        if: env.NEW_RELEASE != dotenv.BUILD_VERSION
+        if: env.NEW_RELEASE != ${{ steps.dotenv.outputs.BUILD_VERSION }}
         id: tagcheck
         run: |
           if git rev-parse "refs/tags/${NEW_RELEASE}" >/dev/null 2>&1; then
@@ -68,6 +68,6 @@ jobs:
           git push origin HEAD --tags
           
       - name: Trigger docker publish workflow
-        if: env.NEW_RELEASE != dotenv.BUILD_VERSION
+        if: env.NEW_RELEASE != ${{ steps.dotenv.outputs.BUILD_VERSION }}
         run: |
           gh workflow run docker-publish.yml -f release_tag="v$NEW_RELEASE"
