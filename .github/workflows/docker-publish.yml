@@ -9,10 +9,6 @@ on:
     tags: [ 'v*.*.*' ]
   
   workflow_dispatch:
-    inputs:
-      release_tag:
-        description: "External release tag"
-        required: true
 
 env:
   REGISTRY: ghcr.io
@@ -40,12 +36,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Resolve image tag
-        run: |
-          if [ -n "${{ inputs.release_tag }}" ]; then
-            echo "BUILD_VERSION=${{ inputs.release_tag }}" >> $GITHUB_ENV
-          fi
 
       - name: Docker meta
         id: meta
@@ -69,4 +59,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
-            BUILD_VERSION=${{ env.BUILD_VERSION }}
+            BUILD_VERSION=${{ BUILD_VERSION }}
