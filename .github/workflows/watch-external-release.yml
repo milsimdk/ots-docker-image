@@ -64,6 +64,6 @@ jobs:
           git commit -m "Update .env with BUILD_VERSION=v${NEW_RELEASE}"
 
           # Create and push both the tag and the commit
-          git tag v${NEW_RELEASE} -m "Version ${BUILD_VERSION} released"
+          git tag v${NEW_RELEASE} -m "Version ${NEW_RELEASE} released"
           git push
           git push --tags
