@@ -68,4 +68,4 @@ jobs:
           git push
           git push --tags
 
-          gh workflow run -f docker-publish.yml --ref ${NEW_RELEASE}
+          gh workflow run docker-publish.yml --ref ${NEW_RELEASE}
