@@ -67,3 +67,5 @@ jobs:
           git tag v${NEW_RELEASE} -m "Version ${NEW_RELEASE} released"
           git push
           git push --tags
+
+          gh workflow run -f docker-publish.yml --ref v${NEW_RELEASE}
