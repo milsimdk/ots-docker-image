@@ -66,8 +66,3 @@ jobs:
           # Create and push both the tag and the commit
           git tag "v${NEW_RELEASE}"
           git push origin HEAD --tags
-          
-      - name: Trigger docker publish workflow
-        if: env.NEW_RELEASE != ${{ steps.dotenv.outputs.BUILD_VERSION }}
-        run: |
-          gh workflow run docker-publish.yml
