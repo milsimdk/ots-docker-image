@@ -32,7 +32,7 @@ jobs:
             https://api.github.com/repos/brian7704/OpenTAKServer/releases/latest \
             | jq -r .tag_name)
 
-          echo "NEW_RELEASE=$LATEST" >> $GITHUB_ENV
+          echo "NEW_RELEASE=v$LATEST" >> $GITHUB_ENV
       
       - name: Stop if no new release
         if: env.NEW_RELEASE == ${{ steps.dotenv.outputs.BUILD_VERSION }}
@@ -59,13 +59,13 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # Update .env before creating the tag
-          echo "BUILD_VERSION=v${NEW_RELEASE}" > .env
+          echo "BUILD_VERSION=${NEW_RELEASE}" > .env
           git add .env
-          git commit -m "Update .env with BUILD_VERSION=v${NEW_RELEASE}"
+          git commit -m "Update .env with BUILD_VERSION=${NEW_RELEASE}"
 
           # Create and push both the tag and the commit
-          git tag v${NEW_RELEASE} -m "Version ${NEW_RELEASE} released"
+          git tag ${NEW_RELEASE} -m "Version ${NEW_RELEASE} released"
           git push
           git push --tags
 
-          gh workflow run -f docker-publish.yml --ref v${NEW_RELEASE}
+          gh workflow run -f docker-publish.yml --ref ${NEW_RELEASE}
