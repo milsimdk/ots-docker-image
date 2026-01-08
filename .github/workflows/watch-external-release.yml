@@ -47,9 +47,14 @@ jobs:
           else
             echo "Tag ${NEW_RELEASE} does not exist. Proceeding..."
           fi
-          
+
+        
       - name: Create and push git tag + update .env
         run: |
+
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
           # Update .env before creating the tag
           echo "BUILD_VERSION=${NEW_RELEASE}" > .env
           git add .env
