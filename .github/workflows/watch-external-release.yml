@@ -70,4 +70,4 @@ jobs:
       - name: Trigger docker publish workflow
         if: env.NEW_RELEASE != ${{ steps.dotenv.outputs.BUILD_VERSION }}
         run: |
-          gh workflow run docker-publish.yml -f release_tag="v$NEW_RELEASE"
+          gh workflow run docker-publish.yml
