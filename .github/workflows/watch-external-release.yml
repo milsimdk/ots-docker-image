@@ -35,12 +35,12 @@ jobs:
           echo "NEW_RELEASE=v$LATEST" >> $GITHUB_ENV
       
       - name: Stop if no new release
-        if: env.NEW_RELEASE == ${{ steps.dotenv.outputs.BUILD_VERSION }}
+        if: env.NEW_RELEASE == steps.dotenv.outputs.BUILD_VERSION
         run: |
           echo "No new external release detected. Skipping..."
       
       - name: Check if tag exists
-        if: env.NEW_RELEASE != ${{ steps.dotenv.outputs.BUILD_VERSION }}
+        if: env.NEW_RELEASE != steps.dotenv.outputs.BUILD_VERSION
         id: tagcheck
         run: |
           if git rev-parse "refs/tags/${NEW_RELEASE}" >/dev/null 2>&1; then

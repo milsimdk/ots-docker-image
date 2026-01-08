@@ -7,7 +7,7 @@ concurrency:
 on:
   push:
     tags: [ 'v*.*.*' ]
-workflow_dispatch:
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
