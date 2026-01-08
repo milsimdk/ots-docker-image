@@ -23,10 +23,9 @@ jobs:
           fetch-depth: 0  # ensures we have all tags
           
       - name: Load .env variables
-        uses: dotenv-action/load@v2
-        with:
-          env_file: .env 
-          
+        id: dotenv
+        uses: falti/dotenv-action@v1.1.5
+           
       - name: Fetch latest external release
         run: |
           LATEST=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
@@ -36,12 +35,12 @@ jobs:
           echo "NEW_RELEASE=$LATEST" >> $GITHUB_ENV
       
       - name: Stop if no new release
-        if: env.NEW_RELEASE == env.BUILD_VERSION
+        if: env.NEW_RELEASE == dotenv.BUILD_VERSION
         run: |
           echo "No new external release detected. Skipping..."
       
       - name: Check if tag exists
-        if: env.NEW_RELEASE != env.BUILD_VERSION
+        if: env.NEW_RELEASE != dotenv.BUILD_VERSION
         id: tagcheck
         run: |
           if git rev-parse "refs/tags/${NEW_RELEASE}" >/dev/null 2>&1; then
@@ -69,6 +68,6 @@ jobs:
           git push origin HEAD --tags
           
       - name: Trigger docker publish workflow
-        if: env.NEW_RELEASE != env.OLD_RELEASE
+        if: env.NEW_RELEASE != dotenv.BUILD_VERSION
         run: |
           gh workflow run docker-publish.yml -f release_tag="v$NEW_RELEASE"
