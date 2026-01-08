@@ -9,6 +9,9 @@ permissions:
   contents: write
   actions: write
 
+env:
+    GH_TOKEN: ${{ github.token }}
+    
 jobs:
   check-release:
     runs-on: ubuntu-latest
@@ -26,7 +29,7 @@ jobs:
       - name: Fetch latest external release
         run: |
           LATEST=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/brian7704/OpenTAKServer/releases/latest \
             | jq -r .tag_name)
 
@@ -67,8 +70,6 @@ jobs:
           
       - name: Trigger docker publish workflow
         if: env.NEW_RELEASE != env.OLD_RELEASE
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Update stored release
           gh variable set LAST_OTS_RELEASE --body "$NEW_RELEASE"
