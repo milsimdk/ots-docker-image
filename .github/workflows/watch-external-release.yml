@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   actions: write
 
 jobs:
@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # IMPORTANT: needed to see tags
+          fetch-depth: 0  # ensures we have all tags
           
       - name: Get last stored release
         run: |
@@ -27,40 +27,43 @@ jobs:
         run: |
           LATEST=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/OWNER/EXTERNAL_REPO/releases/latest \
+            https://api.github.com/repos/brian7704/OpenTAKServer/releases/latest \
             | jq -r .tag_name)
 
           echo "NEW_RELEASE=$LATEST" >> $GITHUB_ENV
       
       - name: Stop if no new release
         if: env.NEW_RELEASE == env.OLD_RELEASE
-        run: echo "No new external release"
+        run: |
+          echo "No new external release detected. Skipping..."
+          exit 0   # Stop the workflow early
       
       - name: Check if tag exists
-        if: env.NEW_RELEASE != env.OLD_RELEASE
         id: tagcheck
         run: |
           if git rev-parse "refs/tags/${NEW_RELEASE}" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag ${NEW_RELEASE} already exists. Skipping..."
+            exit 0  # Stop the workflow early if the tag already exists
           else
-            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag ${NEW_RELEASE} does not exist. Proceeding..."
           fi
-
-      - name: Create and push tag
-        if: steps.tagcheck.outputs.exists == 'false'
+          
+      - name: Create and push git tag + update .env
         run: |
+          # Update .env before creating the tag
+          echo "BUILD_VERSION=${NEW_RELEASE}" > .env
+          git add .env
+          git commit -m "Update .env with BUILD_VERSION=${NEW_RELEASE}"
+
+          # Create and push both the tag and the commit
           git tag "${NEW_RELEASE}"
-          git push origin "${NEW_RELEASE}"
-
+          git push origin HEAD --tags
+          
       - name: Trigger docker publish workflow
-        if: env.NEW_RELEASE != env.OLD_RELEASE
         run: |
-          echo "Triggering docker-publish.yml for $NEW_RELEASE"
-
           gh workflow run docker-publish.yml \
             -f release_tag="$NEW_RELEASE"
 
       - name: Update stored release
-        if: env.NEW_RELEASE != env.OLD_RELEASE
         run: |
           gh variable set LAST_OTS_RELEASE --body "$NEW_RELEASE"
