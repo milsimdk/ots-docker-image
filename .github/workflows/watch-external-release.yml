@@ -22,26 +22,26 @@ jobs:
         with:
           fetch-depth: 0  # ensures we have all tags
           
-      - name: Get last stored release
-        run: |
-          echo "OLD_RELEASE=$(gh variable get LAST_OTS_RELEASE || echo none)" >> $GITHUB_ENV
-
+      - name: Load .env variables
+        uses: dotenv-action/load@v2
+        with:
+          env_file: .env 
+          
       - name: Fetch latest external release
         run: |
-          LATEST=$(curl -s \
-            -H "Authorization: Bearer $GH_TOKEN" \
+          LATEST=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/brian7704/OpenTAKServer/releases/latest \
             | jq -r .tag_name)
 
           echo "NEW_RELEASE=$LATEST" >> $GITHUB_ENV
       
       - name: Stop if no new release
-        if: env.NEW_RELEASE == env.OLD_RELEASE
+        if: env.NEW_RELEASE == env.BUILD_VERSION
         run: |
           echo "No new external release detected. Skipping..."
       
       - name: Check if tag exists
-        if: env.NEW_RELEASE != env.OLD_RELEASE
+        if: env.NEW_RELEASE != env.BUILD_VERSION
         id: tagcheck
         run: |
           if git rev-parse "refs/tags/${NEW_RELEASE}" >/dev/null 2>&1; then
@@ -60,18 +60,15 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # Update .env before creating the tag
-          echo "BUILD_VERSION=${NEW_RELEASE}" > .env
+          echo "BUILD_VERSION=v${NEW_RELEASE}" > .env
           git add .env
-          git commit -m "Update .env with BUILD_VERSION=${NEW_RELEASE}"
+          git commit -m "Update .env with BUILD_VERSION=v${NEW_RELEASE}"
 
           # Create and push both the tag and the commit
-          git tag "${NEW_RELEASE}"
+          git tag "v${NEW_RELEASE}"
           git push origin HEAD --tags
           
       - name: Trigger docker publish workflow
         if: env.NEW_RELEASE != env.OLD_RELEASE
         run: |
-          # Update stored release
-          gh variable set LAST_OTS_RELEASE --body "$NEW_RELEASE"
-          
-          gh workflow run docker-publish.yml -f release_tag="$NEW_RELEASE"
+          gh workflow run docker-publish.yml -f release_tag="v$NEW_RELEASE"
