@@ -36,22 +36,23 @@ jobs:
         if: env.NEW_RELEASE == env.OLD_RELEASE
         run: |
           echo "No new external release detected. Skipping..."
-          exit_with_success # This stops the workflow with a success status
       
       - name: Check if tag exists
+        if: env.NEW_RELEASE != env.OLD_RELEASE
         id: tagcheck
         run: |
           if git rev-parse "refs/tags/${NEW_RELEASE}" >/dev/null 2>&1; then
             echo "Tag ${NEW_RELEASE} already exists. Skipping..."
-            exit_with_success # This stops the workflow with a success status
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "Tag ${NEW_RELEASE} does not exist. Proceeding..."
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
         
       - name: Create and push git tag + update .env
+        if: steps.tagcheck.outputs.exists == 'false'
         run: |
-
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -65,10 +66,12 @@ jobs:
           git push origin HEAD --tags
           
       - name: Trigger docker publish workflow
+        if: env.NEW_RELEASE != env.OLD_RELEASE
         run: |
           gh workflow run docker-publish.yml \
             -f release_tag="$NEW_RELEASE"
 
       - name: Update stored release
+        if: env.NEW_RELEASE != env.OLD_RELEASE
         run: |
           gh variable set LAST_OTS_RELEASE --body "$NEW_RELEASE"
