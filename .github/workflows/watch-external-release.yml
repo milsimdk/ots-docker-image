@@ -1,0 +1,41 @@
+name: Watch External Repo Release
+
+on:
+  schedule:
+    - cron: "* * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  check-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get last stored release
+        run: |
+          echo "OLD_RELEASE=$(gh variable get LAST_OTS_RELEASE || echo none)" >> $GITHUB_ENV
+
+      - name: Fetch latest external release
+        run: |
+          LATEST=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/OWNER/EXTERNAL_REPO/releases/latest \
+            | jq -r .tag_name)
+
+          echo "NEW_RELEASE=$LATEST" >> $GITHUB_ENV
+
+      - name: Trigger docker publish workflow
+        if: env.NEW_RELEASE != env.OLD_RELEASE
+        run: |
+          echo "Triggering docker-publish.yml for $NEW_RELEASE"
+
+          gh workflow run docker-publish.yml \
+            -f release_tag="$NEW_RELEASE"
+
+      - name: Update stored release
+        if: env.NEW_RELEASE != env.OLD_RELEASE
+        run: |
+          gh variable set LAST_OTS_RELEASE --body "$NEW_RELEASE"
